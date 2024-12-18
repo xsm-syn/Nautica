@@ -171,13 +171,15 @@ export default {
           return await websocketHandler(request);
         }
       }
-
+/*
       if (url.pathname === "/") {
         const hostname = request.headers.get("Host");
         return Response.redirect(`${url.protocol}//${hostname}/sub/0`, 302);
       }
+*/
       
-      else if (url.pathname === "/link") {
+/* HANYA DOKUMENTASI SEDERHANA PENGGUNAAN SUBSCRIPTION */
+      if (url.pathname === "/link") {
         const htmlDocumentation = `
         <!DOCTYPE html>
 <html lang="id">
@@ -265,13 +267,15 @@ export default {
     
     <h2>Contoh Penggunaan</h2>
     <pre>
+/link/vless?type=ws&bug=104.26.7.171&cc=ID&limit=15
+/link/vless?type=wildcard&bug=zaintest.vuclip.com&cc=ID&limit=15
 /link/vless?cc=US,SG&count=3&limit=5
-/link/trojan?type=wildcard&bug=my-bug.com
+/link/trojan?type=wildcard&bug=mybug.com
 /link/ss?count=2
     </pre>
     
     <h2>Catatan</h2>
-    <p>Pastikan variabel lingkungan <code>PROXY_BANK_URL</code> sudah diatur dengan benar untuk menyediakan daftar proxy.</p>
+    <p>Pastikan variabel <code>PROXY_BANK_URL</code> sudah diatur dengan benar untuk menyediakan daftar proxy.</p>
 
     <div class="footer">
       &copy; ${new Date().getFullYear()} Proxy Link API
@@ -403,6 +407,7 @@ export default {
 
       const targetReverseProxy = env.REVERSE_PROXY_TARGET || "example.com";
       return await reverseProxy(request, targetReverseProxy);
+      
     } catch (err) {
       return new Response(`An error occurred: ${err.toString()}`, {
         status: 500,
@@ -414,6 +419,7 @@ export default {
   },
 };
 
+/* TAMPILAN FORMAT SUBSCRIPTION*/
 function formatSubsLInk(proxyList, subType, type, bug, hostname) {
   return proxyList
     .map(proxy => {
@@ -427,7 +433,7 @@ function formatSubsLInk(proxyList, subType, type, bug, hostname) {
         } else if (subType === "vless") {
           account = `vless://${uuid}@${bug}:443?encryption=none&type=ws&host=${hostname}&path=%2F${proxyPath}&security=tls&sni=${hostname}#(${proxy.country}) ${proxy.org}`;
         } else if (subType === "ss") {
-          const encodedCredentials = btoa(`aes-256-gcm:${uuid}`);
+          const encodedCredentials = btoa(`none:${uuid}`);
           account = `ss://${encodedCredentials}@${bug}:443?encryption=none&type=ws&host=${hostname}&path=%2F${proxyPath}&security=tls&sni=${hostname}#(${proxy.country}) ${proxy.org}`;
         }
       } else if (type === "wildcard") {
@@ -436,7 +442,7 @@ function formatSubsLInk(proxyList, subType, type, bug, hostname) {
         } else if (subType === "vless") {
           account = `vless://${uuid}@${bug}:443?encryption=none&type=ws&host=${bug}.${hostname}&path=%2F${proxyPath}&security=tls&sni=${bug}.${hostname}#(${proxy.country}) ${proxy.org}`;
         } else if (subType === "ss") {
-          const encodedCredentials = btoa(`aes-256-gcm:${uuid}`);
+          const encodedCredentials = btoa(`none:${uuid}`);
           account = `ss://${encodedCredentials}@${bug}:443?encryption=none&type=ws&host=${bug}.${hostname}&path=%2F${proxyPath}&security=tls&sni=${bug}.${hostname}#(${proxy.country}) ${proxy.org}`;
         }
       }
