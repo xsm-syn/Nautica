@@ -12,6 +12,8 @@ let proxyIP = "";
 let cachedProxyList = [];
 
 // Constant
+const APP_DOMAIN = `${serviceName}.${rootDomain}`;
+const DOH_SERVER = "https://doh.dns.sb/dns-query";
 const PROXY_HEALTH_CHECK_API = "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check";
 const PROXY_PER_PAGE = 24;
 const WS_READY_STATE_OPEN = 1;
@@ -110,7 +112,6 @@ function getAllConfig(request, hostName, proxyList, page = 0) {
       for (const port of ports) {
         uri.port = port.toString();
         for (const protocol of protocols) {
-          // Special exceptions
           if (protocol === "ss") {
             uri.username = btoa(`none:${uuid}`);
           } else {
@@ -121,7 +122,6 @@ function getAllConfig(request, hostName, proxyList, page = 0) {
           uri.searchParams.set("security", port == 443 ? "tls" : "none");
           uri.searchParams.set("sni", port == 80 && protocol == "vless" ? "" : hostName);
 
-          // Build VPN URI
           proxies.push(uri.toString());
         }
       }
@@ -136,7 +136,6 @@ function getAllConfig(request, hostName, proxyList, page = 0) {
       );
     }
 
-    // Build pagination
     document.addPageButton("Prev", `/sub/${page > 0 ? page - 1 : 0}`, page > 0 ? false : true);
     document.addPageButton("Next", `/sub/${page + 1}`, page < Math.floor(proxyList.length / 10) ? false : true);
 
@@ -146,37 +145,156 @@ function getAllConfig(request, hostName, proxyList, page = 0) {
   }
 }
 
+function generateUUID() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     try {
       const url = new URL(request.url);
       const upgradeHeader = request.headers.get("Upgrade");
 
-      // Gateway check
       if (apiKey && apiEmail && accountID && zoneID) {
         isApiReady = true;
       }
 
-      // Handle proxy client
       if (upgradeHeader === "websocket") {
         const proxyMatch = url.pathname.match(/^\/(.+[:=-]\d+)$/);
 
         if (proxyMatch) {
           proxyIP = proxyMatch[1];
-          return await websockerHandler(request);
+          return await websocketHandler(request);
         }
       }
 
-      if (url.pathname.startsWith("/sub")) {
+      if (url.pathname === "/") {
+        const hostname = request.headers.get("Host");
+        return Response.redirect(`${url.protocol}//${hostname}/sub/0`, 302);
+      }
+      
+      else if (url.pathname === "/link") {
+        const htmlDocumentation = `
+        <!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumentasi API Proxy Link</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #4CAF50;
+      text-align: center;
+    }
+    h2 {
+      color: #333;
+      margin-top: 20px;
+    }
+    p {
+      margin: 10px 0;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    pre {
+      background: #272822;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+    ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dokumentasi API Proxy Link</h1>
+    <p>Selamat datang di <strong>API Proxy Link</strong>. API ini memungkinkan Anda untuk menghasilkan link proxy untuk berbagai protokol seperti <code>vless</code>, <code>trojan</code>, dan <code>ss</code>.</p>
+    
+    <h2>Endpoint</h2>
+    <p><code>/link/{type}</code></p>
+    <p><strong>{type}</strong> bisa berupa salah satu dari berikut:</p>
+    <ul>
+      <li><code>vless</code></li>
+      <li><code>trojan</code></li>
+      <li><code>ss</code></li>
+    </ul>
+    
+    <h2>Parameter Query</h2>
+    <ul>
+      <li><code>type</code> (opsional, default: <code>ws</code>): Tipe koneksi. Pilihan: <code>ws</code> (WebSocket), <code>wildcard</code>.</li>
+      <li><code>bug</code> (opsional, default: <code>hostname</code>): Nilai bug atau SNI.</li>
+      <li><code>cc</code> (opsional): Daftar kode negara yang dipisahkan koma untuk memfilter proxy (misalnya, <code>US,SG,ID</code>).</li>
+      <li><code>count</code> (opsional, default: <code>2</code>): Jumlah proxy yang diambil per negara.</li>
+      <li><code>limit</code> (opsional, default: <code>10</code>): Jumlah maksimal proxy yang ditampilkan.</li>
+    </ul>
+    
+    <h2>Contoh Penggunaan</h2>
+    <pre>
+/link/vless?cc=US,SG&count=3&limit=5
+/link/trojan?type=wildcard&bug=my-bug.com
+/link/ss?count=2
+    </pre>
+    
+    <h2>Catatan</h2>
+    <p>Pastikan variabel lingkungan <code>PROXY_BANK_URL</code> sudah diatur dengan benar untuk menyediakan daftar proxy.</p>
+
+    <div class="footer">
+      &copy; ${new Date().getFullYear()} Proxy Link API
+    </div>
+  </div>
+</body>
+</html>
+
+        `;
+        return new Response(htmlDocumentation, {
+          status: 200,
+          headers: { "Content-Type": "text/html;charset=utf-8" },
+        });
+      }
+
+      else if (url.pathname.startsWith("/sub")) {
         const page = url.pathname.match(/^\/sub\/(\d+)$/);
         const pageIndex = parseInt(page ? page[1] : "0");
         const hostname = request.headers.get("Host");
 
-        // Queries
         const countrySelect = url.searchParams.get("cc")?.split(",");
         const proxyBankUrl = url.searchParams.get("proxy-list") || env.PROXY_BANK_URL;
         let proxyList = (await getProxyList(proxyBankUrl)).filter((proxy) => {
-          // Filter proxies by Country
           if (countrySelect) {
             return countrySelect.includes(proxy.country);
           }
@@ -189,7 +307,55 @@ export default {
           status: 200,
           headers: { "Content-Type": "text/html;charset=utf-8" },
         });
-      } else if (url.pathname.startsWith("/check")) {
+      } 
+
+      else if (url.pathname.startsWith("/link")) {
+        const params = url.searchParams;
+        const hostname = request.headers.get("Host");
+        const subType = url.pathname.split("/")[2];
+        const type = params.get("type") || "ws";
+        const bug = params.get("bug") || hostname;
+        const cc = params.get("cc")?.split(",").map(country => country.toUpperCase()) || [];
+        const count = parseInt(params.get("count") || "2");
+        const limit = parseInt(params.get("limit") || "100");
+      
+        if (!["vless", "trojan", "ss"].includes(subType)) {
+          return new Response("Invalid subscription type", { status: 400 });
+        }
+      
+        const proxyBankUrl = env.PROXY_BANK_URL;
+        let proxyList = await getProxyList(proxyBankUrl);
+      
+        if (cc.length > 0) {
+          proxyList = proxyList.filter(proxy => cc.includes(proxy.country));
+        } else {
+          const proxiesByCountry = {};
+          proxyList.forEach(proxy => {
+            if (!proxiesByCountry[proxy.country]) {
+              proxiesByCountry[proxy.country] = [];
+            }
+            proxiesByCountry[proxy.country].push(proxy);
+          });
+      
+          proxyList = Object.values(proxiesByCountry).flatMap(proxies => {
+            const shuffle = proxies.sort(() => Math.random() - 0.5);
+            return shuffle.slice(0, count);
+          });
+        }
+
+        proxyList = proxyList.slice(0, limit);
+      
+        const result = formatSubsLInk(proxyList, subType, type, bug, hostname);
+      
+        return new Response(result, {
+          status: 200,
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+        });
+      }      
+      
+      else if (url.pathname.startsWith("/check")) {
         const target = url.searchParams.get("target").split(":");
         const tls = url.searchParams.get("tls");
         const result = await checkProxyHealth(target[0], target[1] || "443", tls);
@@ -248,7 +414,39 @@ export default {
   },
 };
 
-async function websockerHandler(request) {
+function formatSubsLInk(proxyList, subType, type, bug, hostname) {
+  return proxyList
+    .map(proxy => {
+      let account;
+      const uuid = generateUUID();
+      const proxyPath = encodeURIComponent(`${proxy.proxyIP}-${proxy.proxyPort}`);
+
+      if (type === "ws") {
+        if (subType === "trojan") {
+          account = `trojan://${uuid}@${bug}:443?encryption=none&type=ws&host=${hostname}&path=%2F${proxyPath}&security=tls&sni=${hostname}#(${proxy.country}) ${proxy.org}`;
+        } else if (subType === "vless") {
+          account = `vless://${uuid}@${bug}:443?encryption=none&type=ws&host=${hostname}&path=%2F${proxyPath}&security=tls&sni=${hostname}#(${proxy.country}) ${proxy.org}`;
+        } else if (subType === "ss") {
+          const encodedCredentials = btoa(`aes-256-gcm:${uuid}`);
+          account = `ss://${encodedCredentials}@${bug}:443?encryption=none&type=ws&host=${hostname}&path=%2F${proxyPath}&security=tls&sni=${hostname}#(${proxy.country}) ${proxy.org}`;
+        }
+      } else if (type === "wildcard") {
+        if (subType === "trojan") {
+          account = `trojan://${uuid}@${bug}:443?encryption=none&type=ws&host=${bug}.${hostname}&path=%2F${proxyPath}&security=tls&sni=${bug}.${hostname}#(${proxy.country}) ${proxy.org}`;
+        } else if (subType === "vless") {
+          account = `vless://${uuid}@${bug}:443?encryption=none&type=ws&host=${bug}.${hostname}&path=%2F${proxyPath}&security=tls&sni=${bug}.${hostname}#(${proxy.country}) ${proxy.org}`;
+        } else if (subType === "ss") {
+          const encodedCredentials = btoa(`aes-256-gcm:${uuid}`);
+          account = `ss://${encodedCredentials}@${bug}:443?encryption=none&type=ws&host=${bug}.${hostname}&path=%2F${proxyPath}&security=tls&sni=${bug}.${hostname}#(${proxy.country}) ${proxy.org}`;
+        }
+      }
+
+      return account;
+  })
+  .join("\n");
+}
+
+async function websocketHandler(request) {
   const webSocketPair = new WebSocketPair();
   const [client, webSocket] = Object.values(webSocketPair);
 
@@ -412,7 +610,7 @@ async function handleTCPOutBound(
 }
 
 async function handleUDPOutbound(webSocket, responseHeader, log) {
-  let isVlessHeaderSent = false;
+  let isHeaderSent = false;
   const transformStream = new TransformStream({
     start(controller) {},
     transform(chunk, controller) {
@@ -430,7 +628,7 @@ async function handleUDPOutbound(webSocket, responseHeader, log) {
     .pipeTo(
       new WritableStream({
         async write(chunk) {
-          const resp = await fetch("https://1.1.1.1/dns-query", {
+          const resp = await fetch(DOH_SERVER, {
             method: "POST",
             headers: {
               "content-type": "application/dns-message",
@@ -442,11 +640,11 @@ async function handleUDPOutbound(webSocket, responseHeader, log) {
           const udpSizeBuffer = new Uint8Array([(udpSize >> 8) & 0xff, udpSize & 0xff]);
           if (webSocket.readyState === WS_READY_STATE_OPEN) {
             log(`doh success and dns message length is ${udpSize}`);
-            if (isVlessHeaderSent) {
+            if (isHeaderSent) {
               webSocket.send(await new Blob([udpSizeBuffer, dnsQueryResult]).arrayBuffer());
             } else {
               webSocket.send(await new Blob([responseHeader, udpSizeBuffer, dnsQueryResult]).arrayBuffer());
-              isVlessHeaderSent = true;
+              isHeaderSent = true;
             }
           }
         },
@@ -844,6 +1042,13 @@ class CloudflareApi {
     if (!domain.endsWith(rootDomain)) return 400;
     if (registeredDomains.includes(domain)) return 409;
 
+    try {
+      const domainTest = await fetch(`https://${domain.replaceAll("." + APP_DOMAIN, "")}`);
+      if (domainTest.status == 530) return 530;
+    } catch (e) {
+      return 400;
+    }
+
     const url = `https://api.cloudflare.com/client/v4/accounts/${this.accountID}/workers/domains`;
     const res = await fetch(url, {
       method: "PUT",
@@ -953,6 +1158,59 @@ let baseHTML = `
       <div class="fixed z-20 top-0 w-full h-full bg-white dark:bg-neutral-800">
         <p id="container-window-info" class="text-center w-full h-full top-1/4 absolute dark:text-white"></p>
       </div>
+      <!-- Output Format -->
+      <div id="output-window" class="fixed z-20 top-0 right-0 w-full h-full flex justify-center items-center hidden">
+        <div class="w-[75%] h-[30%] flex flex-col gap-1 p-1 text-center rounded-md">
+          <div class="basis-1/6 w-full h-full rounded-md">
+            <div class="flex w-full h-full gap-1 justify-between">
+              <button
+                onclick="copyToClipboardAsTarget('clash')"
+                class="basis-1/2 p-2 rounded-full bg-amber-400 flex justify-center items-center"
+              >
+                Clash
+              </button>
+              <button
+                onclick="copyToClipboardAsTarget('sfa')"
+                class="basis-1/2 p-2 rounded-full bg-amber-400 flex justify-center items-center"
+              >
+                SFA
+              </button>
+              <button
+                onclick="copyToClipboardAsTarget('bfr')"
+                class="basis-1/2 p-2 rounded-full bg-amber-400 flex justify-center items-center"
+              >
+                BFR
+              </button>
+            </div>
+          </div>
+          <div class="basis-1/6 w-full h-full rounded-md">
+            <div class="flex w-full h-full gap-1 justify-between">
+              <button
+                onclick="copyToClipboardAsTarget('v2ray')"
+                class="basis-1/2 p-2 rounded-full bg-amber-400 flex justify-center items-center"
+              >
+                V2Ray/Xray
+              </button>
+              <button
+                onclick="copyToClipboardAsRaw()"
+                class="basis-1/2 p-2 rounded-full bg-amber-400 flex justify-center items-center"
+              >
+                Raw
+              </button>
+            </div>
+          </div>
+          <div class="basis-1/6 w-full h-full rounded-md">
+            <div class="flex w-full h-full gap-1 justify-center">
+              <button
+                onclick="toggleOutputWindow()"
+                class="basis-1/2 border-2 border-indigo-400 hover:bg-indigo-400 dark:text-white p-2 rounded-full flex justify-center items-center"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Wildcards -->
       <div id="wildcards-window" class="fixed hidden z-20 top-0 right-0 w-full h-full flex justify-center items-center">
         <div class="w-[75%] h-[30%] flex flex-col gap-1 p-1 text-center rounded-md">
@@ -1028,11 +1286,18 @@ let baseHTML = `
     <script>
       // Shared
       const rootDomain = "${serviceName}.${rootDomain}";
+      const notification = document.getElementById("notification-badge");
       const windowContainer = document.getElementById("container-window");
       const windowInfoContainer = document.getElementById("container-window-info");
+      const converterUrl =
+        "https://script.google.com/macros/s/AKfycbwwVeHNUlnP92syOP82p1dOk_-xwBgRIxkTjLhxxZ5UXicrGOEVNc5JaSOu0Bgsx_gG/exec";
+
 
       // Switches
       let isDomainListFetched = false;
+
+      // Local variable
+      let rawConfig = "";
 
       function getDomainList() {
         if (isDomainListFetched) return;
@@ -1083,15 +1348,19 @@ let baseHTML = `
             if (res.status == 409) {
               windowInfoContainer.innerText = "Domain exists!";
             } else {
-              windowInfoContainer.innerText = "Error " + res.statusText;
+              windowInfoContainer.innerText = "Error " + res.status;
             }
           }
         });
       }
 
       function copyToClipboard(text) {
-        const notification = document.getElementById("notification-badge");
-        navigator.clipboard.writeText(text);
+        toggleOutputWindow();
+        rawConfig = text;
+      }
+
+      function copyToClipboardAsRaw() {
+        navigator.clipboard.writeText(rawConfig);
 
         notification.classList.remove("opacity-0");
         setTimeout(() => {
@@ -1099,11 +1368,43 @@ let baseHTML = `
         }, 2000);
       }
 
+      async function copyToClipboardAsTarget(target) {
+        windowInfoContainer.innerText = "Generating config...";
+        const url = converterUrl + "?target=" + target + "&url=" + encodeURIComponent(rawConfig);;
+        const res = await fetch(url, {
+          redirect: "follow",
+        });
+
+        if (res.status == 200) {
+          windowInfoContainer.innerText = "Done!";
+          navigator.clipboard.writeText(await res.text());
+
+          notification.classList.remove("opacity-0");
+          setTimeout(() => {
+            notification.classList.add("opacity-0");
+          }, 2000);
+        } else {
+          windowInfoContainer.innerText = "Error " + res.statusText;
+        }
+      }
+
       function navigateTo(link) {
         window.location.href = link + window.location.search;
       }
 
+      function toggleOutputWindow() {
+        windowInfoContainer.innerText = "Select output:";
+        toggleWindow();
+        const rootElement = document.getElementById("output-window");
+        if (rootElement.classList.contains("hidden")) {
+          rootElement.classList.remove("hidden");
+        } else {
+          rootElement.classList.add("hidden");
+        }
+      }
+
       function toggleWildcardsWindow() {
+        windowInfoContainer.innerText = "Domain list";
         toggleWindow();
         getDomainList();
         const rootElement = document.getElementById("wildcards-window");
