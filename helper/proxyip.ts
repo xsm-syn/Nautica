@@ -131,8 +131,22 @@ async function checkProxy(proxyAddress: string, proxyPort: number): Promise<Prox
 })();
 
 function sortByCountry(a: string, b: string) {
-  a = a.split(",")[2];
-  b = b.split(",")[2];
+  const priorityCountries = ["ID", "SG", "US", "KR", "JP", "CN", "HK", "MY"];
+  const countryA = a.split(",")[2];
+  const countryB = b.split(",")[2];
 
-  return a.localeCompare(b);
+  // Periksa jika kedua negara berada di daftar prioritas
+  const indexA = priorityCountries.indexOf(countryA);
+  const indexB = priorityCountries.indexOf(countryB);
+
+  if (indexA !== -1 && indexB !== -1) {
+    return indexA - indexB; // Urutkan sesuai prioritas
+  }
+
+  // Jika salah satu berada di daftar prioritas
+  if (indexA !== -1) return -1;
+  if (indexB !== -1) return 1;
+
+  // Urutkan negara lainnya secara alfabetis
+  return countryA.localeCompare(countryB);
 }
