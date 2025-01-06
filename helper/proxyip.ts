@@ -84,7 +84,9 @@ async function checkProxy(proxyAddress: string, proxyPort: number): Promise<Prox
     const proxyKey = `${proxy.address}:${proxy.port}`;
     if (!proxyChecked.includes(proxyKey)) {
       proxyChecked.push(proxyKey);
-      uniqueRawProxies.push(`${proxy.address},${proxy.port},${proxy.country},${proxy.org.replaceAll(/[+]/g, " ")}`);
+      uniqueRawProxies.push(
+        `${proxy.address},${proxy.port},${proxy.country},${(proxy.org || "").replaceAll(/[+]/g, " ")}`
+      );
     } else {
       continue;
     }
@@ -114,14 +116,13 @@ async function checkProxy(proxyAddress: string, proxyPort: number): Promise<Prox
       await Bun.sleep(1);
     }
   }
-
-  // Waiting for all process to be completed
+  
   while (CHECK_QUEUE.length) {
     await Bun.sleep(1);
   }
 
-  uniqueRawProxies.sort(sortByCountry);
-  activeProxyList.sort(sortByCountry);
+  uniqueRawProxies.sort(customSortByCountry);
+  activeProxyList.sort(customSortByCountry);
 
   Bun.write(KV_PAIR_PROXY_FILE, JSON.stringify(kvPair, null, "  "));
   Bun.write(RAW_PROXY_LIST_FILE, uniqueRawProxies.join("\n"));
@@ -130,23 +131,17 @@ async function checkProxy(proxyAddress: string, proxyPort: number): Promise<Prox
   console.log(`Waktu proses: ${(Bun.nanoseconds() / 1000000000).toFixed(2)} detik`);
 })();
 
-function sortByCountry(a: string, b: string) {
-  const priorityCountries = ["ID", "SG", "US", "KR", "JP", "CN", "HK", "MY"];
+function customSortByCountry(a: string, b: string) {
+  const priorityCountries = ["ID", "SG", "KR", "CN", "US", "MY"];
+  const getPriority = (country: string) => priorityCountries.indexOf(country) >= 0 ? priorityCountries.indexOf(country) : priorityCountries.length;
+
   const countryA = a.split(",")[2];
   const countryB = b.split(",")[2];
 
-  // Periksa jika kedua negara berada di daftar prioritas
-  const indexA = priorityCountries.indexOf(countryA);
-  const indexB = priorityCountries.indexOf(countryB);
+  const priorityA = getPriority(countryA);
+  const priorityB = getPriority(countryB);
 
-  if (indexA !== -1 && indexB !== -1) {
-    return indexA - indexB; // Urutkan sesuai prioritas
-  }
+  if (priorityA !== priorityB) return priorityA - priorityB;
 
-  // Jika salah satu berada di daftar prioritas
-  if (indexA !== -1) return -1;
-  if (indexB !== -1) return 1;
-
-  // Urutkan negara lainnya secara alfabetis
   return countryA.localeCompare(countryB);
 }
