@@ -1,3 +1,4 @@
+8.215.196.18,587,ID,Alibaba
 103.133.223.51,2096,ID,Cloud Teknologi Nusantara
 43.218.77.16,443,ID,Amazon.com
 43.218.77.16,1443,ID,Amazon.com
