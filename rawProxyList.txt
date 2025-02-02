@@ -20,8 +20,8 @@
 36.95.152.58,12137,ID,PT Telkom Indonesia
 35.219.50.99,443,ID,Google Cloud
 203.194.112.119,8443,ID,First Cagayan Converge Data Center Inc.
-149.129.250.187,443,SG,Alibaba
 45.60.186.91,443,ID,Incapsula
+149.129.250.187,443,SG,Alibaba
 8.219.3.213,41074,SG,Alibaba
 167.253.158.63,2053,SG,Leaseweb Asia
 213.35.100.31,47112,SG,Oracle Cloud
