@@ -21,47 +21,24 @@
 35.219.50.99,443,ID,Google Cloud
 203.194.112.119,8443,ID,First Cagayan Converge Data Center Inc.
 45.60.186.91,443,ID,Incapsula
-101.50.0.114,8443,ID,PT+Beon+Multimedia
-103.133.223.50,2096,ID,Cloud+Teknologi+Nusantara
-103.133.223.51,2096,ID,Cloud+Teknologi+Nusantara
-103.133.223.52,2096,ID,Cloud+Teknologi+Nusantara
-103.168.146.169,20132,ID,PT+Herza+Digital+Indonesia
-103.186.1.209,8443,ID,PT+Cloud+Hosting+Indonesia
-103.186.1.209,2053,ID,PT+Cloud+Hosting+Indonesia
-103.6.207.108,8080,ID,PT Pusat Media Indonesia
-111.95.40.14,32414,ID,Linknet+Fastnet
+101.50.0.114,8443,ID,PT Beon Multimedia
+103.186.1.209,8443,ID,PT Cloud Hosting Indonesia
+111.95.40.14,32414,ID,Linknet Fastnet
 147.139.243.188,587,ID,Alibaba
 147.139.245.56,443,ID,Alibaba
-149.129.250.187,443,ID,Alibaba+(US)+Technology+Co+Ltd
-172.232.231.24,587,ID,Akamai+Connected+Cloud
+149.129.250.187,443,ID,Alibaba (US) Technology Co Ltd
 172.232.237.112,2053,ID,Akamai Connected Cloud
 172.232.239.134,443,ID,Akamai Connected Cloud
-172.232.239.134,587,ID,Akamai+Connected+Cloud
-172.232.239.147,587,ID,Akamai+Connected+Cloud
-172.232.239.151,587,ID,Akamai Connected Cloud
-172.232.239.175,587,ID,Akamai+Connected+Cloud
-172.232.239.249,587,ID,Akamai+Connected+Cloud
+172.232.239.134,587,ID,Akamai Connected Cloud
 172.235.251.223,443,ID,Akamai Connected Cloud
 172.235.251.223,587,ID,Akamai Connected Cloud
 172.235.251.7,587,ID,Akamai Connected Cloud
-203.194.112.119,2053,ID,Rumahweb
-203.194.112.119,8443,ID,CV+Rumahweb+Indonesia
-206.237.98.76,587,ID,PT+Herza+Digital+Indonesia
-35.219.15.90,443,ID,Google Cloud
-35.219.50.99,443,ID,Google Cloud
-36.95.152.58,12137,ID,PT Telkom Indonesia
-38.60.171.111,587,ID,Kaopu+Cloud
-43.133.145.156,53136,ID,Tencent+cloud+computing
-43.218.77.16,1443,ID,Amazoncom
-43.218.77.16,443,ID,Amazoncom
-45.60.186.91,443,ID,Incapsula
+206.237.98.76,587,ID,PT Herza Digital Indonesia
+38.60.171.111,587,ID,Kaopu Cloud
 8.215.19.67,587,ID,Alibaba
-8.215.196.18,587,ID,Alibaba
 8.215.25.225,40422,ID,Alibaba
 8.215.59.6,443,ID,Alibaba
-8.218.107.145,31166,ID,PT+Cloud+Hosting+Indonesia
 101.32.247.126,725,SG,Tencent cloud computing
-149.129.250.187,443,SG,Alibaba
 8.219.3.213,41074,SG,Alibaba
 167.253.158.63,2053,SG,Leaseweb Asia
 213.35.100.31,47112,SG,Oracle Cloud
@@ -247,7 +224,6 @@
 194.9.62.132,57255,SG,SpeedyPage
 45.76.156.96,2053,SG,Vultr
 43.128.95.84,38091,SG,Tencent cloud computing
-101.32.247.126,725,SG,Tencent cloud computing
 43.156.6.97,10392,SG,Tencent cloud computing
 45.76.183.217,49292,SG,Vultr
 139.180.144.170,666,SG,Vultr
