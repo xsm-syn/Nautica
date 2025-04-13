@@ -1,17 +1,17 @@
-8.215.196.18,587,ID,Alibaba,43ms
-35.219.50.99,443,ID,Google Cloud,44ms
-36.95.152.58,12137,ID,PT Telkom Indonesia,46ms
-43.133.149.163,52698,ID,Tencent cloud computing,45ms
-43.218.77.16,443,ID,Amazoncom,44ms
-43.218.77.16,1443,ID,Amazoncom,43ms
-103.6.207.108,8080,ID,PT Pusat Media Indonesia,365ms
-172.232.237.31,587,ID,Akamai Connected Cloud,40ms
-172.232.237.91,587,ID,Akamai Connected Cloud,40ms
-172.232.239.134,443,ID,Akamai Connected Cloud,42ms
-172.232.239.151,587,ID,Akamai Connected Cloud,40ms
-172.235.251.7,587,ID,Akamai Connected Cloud,42ms
-203.194.112.119,2053,ID,First Cagayan Converge Data Center Inc,78ms
-203.194.112.119,8443,ID,First Cagayan Converge Data Center Inc,51ms
+8.215.196.18,587,ID,Alibaba
+35.219.50.99,443,ID,Google Cloud
+36.95.152.58,12137,ID,PT Telkom Indonesia
+43.133.149.163,52698,ID,Tencent cloud computing
+43.218.77.16,443,ID,Amazoncom
+43.218.77.16,1443,ID,Amazoncom
+103.6.207.108,8080,ID,PT Pusat Media Indonesia
+172.232.237.31,587,ID,Akamai Connected Cloud
+172.232.237.91,587,ID,Akamai Connected Cloud
+172.232.239.134,443,ID,Akamai Connected Cloud
+172.232.239.151,587,ID,Akamai Connected Cloud
+172.235.251.7,587,ID,Akamai Connected Cloud
+203.194.112.119,2053,ID,First Cagayan Converge Data Center Inc
+203.194.112.119,8443,ID,First Cagayan Converge Data Center Inc
 101.32.247.126,725,SG,Tencent cloud computing
 103.3.63.253,46683,SG,Akamai Connected Cloud
 104.248.145.216,443,SG,Digital Ocean
