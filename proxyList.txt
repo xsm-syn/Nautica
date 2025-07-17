@@ -1,5 +1,7 @@
 172.232.237.112,2053,ID,Akamai Connected Cloud
 172.232.239.151,587,ID,Akamai Connected Cloud
+206.84.101.83,8443,ID,PT Mitra Visioner
+149.129.250.8,443,ID,Alibaba
 8.215.196.18,587,ID,Alibaba
 43.218.77.16,443,ID,Amazon.com
 203.194.112.119,2053,ID,First Cagayan Converge Data Center Inc.
