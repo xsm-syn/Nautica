@@ -1,16 +1,25 @@
+
 172.232.237.112,2053,ID,Akamai Connected Cloud
 172.232.239.151,587,ID,Akamai Connected Cloud
 206.84.101.83,8443,ID,PT Mitra Visioner
+172.252.8.168,443,ID,PT Mitra Visioner
+103.118.128.246,443,ID,PT Cyberindo Indonesia
 149.129.250.8,443,ID,Alibaba
 8.215.196.18,587,ID,Alibaba
 43.218.77.16,443,ID,Amazon.com
-203.194.112.119,2053,ID,First Cagayan Converge Data Center Inc.
+34.101.86.59,443,ID,Google LLC
+103.146.63.149:443,ID,PT Semut Data Indonesia
+203.194.112.119,2053,ID,Rumahweb Indonesia
+203.194.112.119,8443,ID,Rumahweb Indonesia
+154.205.159.72,2053,ID,Lightnode Limited
+8.215.77.247,49640,ID,Alibaba Cloud
+149.129.250.8,443,ID,Alibaba Cloud
 43.218.77.16,1443,ID,Amazon.com
 103.6.207.108,8080,ID,PT Pusat Media Indonesia
-203.194.112.119,8443,ID,First Cagayan Converge Data Center Inc.
 34.101.247.19,53681,ID,Google Cloud
 36.95.152.58,12137,ID,PT Telkom Indonesia
 172.232.239.134,443,ID,Akamai Connected Cloud
+47.236.118.24,443,SG,Alibaba Cloud
 51.79.254.182,443,SG,OVH Hosting
 194.36.179.17,2053,SG,Neapol Group Ltd
 51.79.158.126,443,SG,OVH Hosting
